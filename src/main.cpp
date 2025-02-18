@@ -25,15 +25,13 @@ int main()
 	double putP_Naive = PriceClass::calculateP_Naive(lookbackPut, S, r, sigma, T, nSimulations);
 	double callP_Antithetic = PriceClass::calculateP_Antithetic(lookbackCall, S, r, sigma, T, nSimulations);
 	double putP_Antithetic = PriceClass::calculateP_Antithetic(lookbackPut, S, r, sigma, T, nSimulations);
-	double callP_GBM = PriceClass::calculateP_GBM(lookbackCall, S, r, sigma, T, nSimulations);
-	double putP_GBM = PriceClass::calculateP_GBM(lookbackPut, S, r, sigma, T, nSimulations);
+	
 
 	std::cout << "Lookback Call Price (Naive): " << callP_Naive << std::endl;
 	std::cout << "Lookback Put Price (Naive): " << putP_Naive << std::endl;
 	std::cout << "Lookback Call Price (Antithetic): " << callP_Antithetic << std::endl;
 	std::cout << "Lookback Put Price (Antithetic): " << putP_Antithetic << std::endl;
-	std::cout << "Lookback Call Price (GBM): " << callP_GBM << std::endl;
-	std::cout << "Lookback Put Price (GBM): " << putP_GBM << std::endl;
+
 
 	return 0;
 }
