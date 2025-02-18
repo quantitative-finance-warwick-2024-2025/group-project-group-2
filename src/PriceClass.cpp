@@ -31,7 +31,7 @@ double PriceClass::calculateP_Naive(const Option& option, double S, double r, do
         // (For j==0 we already have the initial price.)
         for (unsigned int j = 0; j < lookbackOption->getPeriods(); ++j) {
             if (j > 0) {
-                double randNormal = dist(AssetHistory::get_random_generator);
+                double randNormal = dist(AssetHistory::get_random_generator());
                 spotPath *= std::exp((r - 0.5 * sigma * sigma) * dt +
                                      sigma * std::sqrt(dt) * randNormal);
             }
@@ -100,5 +100,15 @@ double PriceClass::calculateP_Antithetic(const Option &option, double S, double 
             }
         }
 
+        // Evaluate the payoff for both paths.
+        double payoff1 = lookbackOption->payoff(spotPath, extreme);
+        double payoff2 = lookbackOption->payoff(antitheticSpotPath, antitheticExtreme);
+        double avgPayoff = (payoff1 + payoff2) / 2.0;
+        sumPayoffs += avgPayoff;
 
     }
+
+    // Discount the average payoff back to present value.
+    double price = (sumPayoffs / nSimulations) * std::exp(-r * lookbackOption->getExpiry());
+    return price;
+}
