@@ -25,6 +25,11 @@ public:
     //      Call - payoff = max(S_T - extreme, 0)
     //      Put - payoff = max(extreme - S_T, 0)
 
+
+    // Overridde the pure virtuaal function
+    double payoff(double S) const override;
+
+    // Special payoff function for lookback options
     double payoff(double S_T, double extreme) const;
 
     // Returns the number of periods used to track underlying

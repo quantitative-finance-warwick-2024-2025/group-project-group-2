@@ -16,6 +16,7 @@ int main()
 	LookbackOption::StrikeType strikeType = LookbackOption::Fixed;
 	unsigned int periods = 10;
 
+
 	// Create a lookback call option
 	LookbackOption lookbackCall(K, T, Option::Call, periods, LookbackOption::Fixed);
 	LookbackOption lookbackPut(K, T, Option::Put, periods, LookbackOption::Fixed);

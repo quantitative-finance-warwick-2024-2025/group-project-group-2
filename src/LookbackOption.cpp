@@ -6,7 +6,14 @@
 // Also stores the number of periods that are monitored
 
 LookbackOption::LookbackOption(double K, double T, Option::Type optionType, unsigned int periods, StrikeType strikeType) 
-    : Option(K,T, optionType), strikeType(strikeType), periods(periods) {}
+    : Option(K,T, optionType), periods(periods), strikeType(strikeType) {}
+
+
+//Override base class of pure virtual function
+// We want to assure consistency in the payoff calculation
+double LookbackOption::payoff(double S) const {
+    return payoff(S, S);
+}
 
 // Payoff function that computes the option payoff based on the final asset price & extreme values
 // For a fixed strike:
