@@ -1,4 +1,5 @@
 //AssetHistory provided in market-sim-demo
+//Some edits to the accessibility of the random genreator function
 #pragma once
 
 #include <sstream>
@@ -18,8 +19,6 @@ class AssetHistory
 	// prevent objects of this class by making constructor private 
 	AssetHistory();
 
-	// used to generate random numbers
-	thread_local static std::default_random_engine RANDOM_GENERATOR;
 
 public:
 
@@ -53,5 +52,14 @@ public:
 
 	/// test the functions by generating asset history and then restoring it from file
 	static void test();
+
+    // Accessor for the random generator
+    // Makes it safer to 
+    static std::default_random_engine& get_random_generator();
+
+private:
+    // Used to generate random numbers (declared only once)
+    thread_local static std::default_random_engine RANDOM_GENERATOR;
+
 
 };

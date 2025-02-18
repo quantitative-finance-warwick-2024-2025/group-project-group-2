@@ -1,5 +1,5 @@
-#ifndef LOOKBACKOPTION_H
-#define LOOKBACKOPTION_H
+#ifndef LOOKBACKOPTION_H // prevents header file from being processed multiple times
+#define LOOKBACKOPTION_H // if not defined, define it
 
 #include "Option.h"
 #include <algorithm>
@@ -15,7 +15,7 @@ public:
     // constructor
     // For fixed strikes, 'strike' is used in the payoff calculation
     // For floating strikes, the final price determines the effective strike
-    LookbackOption(double K, double T, Option::Type optionTypem, unsigned int periods, StrikeType strikeType);
+    LookbackOption(double K, double T, Option::Type optionType, unsigned int periods, StrikeType strikeType);
 
     // Payoff function calculates the option payoff given final asset price and extreme
     // For a fixed strike:
@@ -41,3 +41,5 @@ private:
 };
 
 #endif // LOOKBACKOPTION_H
+
+

@@ -6,7 +6,7 @@ public:
     enum Type { Call, Put }; // create new type
 
     // constructor
-    Option(Type type, double K, double T); //member variables to store type, K, T
+    Option(double K, double T, Type type); //member variables to store type, K, T
 
     virtual double payoff(double S) const = 0; // payoff given underlying, pure virtual function
 
