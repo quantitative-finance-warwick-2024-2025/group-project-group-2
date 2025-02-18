@@ -1,3 +1,4 @@
+//
 //AssetHistory provided in market-sim-demo
 
 #include "AssetHistory.h"
