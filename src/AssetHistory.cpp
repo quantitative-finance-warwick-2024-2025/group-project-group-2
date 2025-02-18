@@ -4,9 +4,15 @@
 #include "Util.h"
 
 // random seed is based on the current time
-thread_local std::default_random_engine AssetHistory::RANDOM_GENERATOR{ static_cast<long unsigned int>(time(0)) };
+thread_local std::default_random_engine AssetHistory::RANDOM_GENERATOR{static_cast<unsigned int>(time(0)) };
 
 using stringstream = std::stringstream;
+
+// Define accessor for the random generator
+std::default_random_engine& AssetHistory::get_random_generator()
+{
+    return RANDOM_GENERATOR;
+}
 
 // format the contents of array arr of double to stringstream ss
 // contents are comma seperated
