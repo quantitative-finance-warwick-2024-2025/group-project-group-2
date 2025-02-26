@@ -12,7 +12,7 @@ int main() {
     double T      = 1.0;
 
     // Test a lookback call, fixed strike
-    unsigned int periods = 10; // pick a baseline number
+    unsigned int periods = 10;
     LookbackOption lookbackCall(K, T, Option::Call, periods, LookbackOption::Fixed);
     LookbackOption lookbackPut(K, T, Option::Put, periods, LookbackOption::Fixed);
 

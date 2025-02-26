@@ -22,23 +22,24 @@ add_executable(my_program ${SRC_FILES})
 target_include_directories(my_program PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 
-# ------------------------------------------------------------------------
-# lookback_convergence (the new convergence main)
-# ------------------------------------------------------------------------
+#//////////////////////////////////////////////////////////////////////////////
+#               lookback_convergence 
+#/////////////////////////////////////////////////////////////////////////////
 add_executable(lookback_convergence
     src/LookbackConvergence.cpp
     src/Option.cpp
     src/LookbackOption.cpp
     src/PriceClass.cpp
     src/Util.cpp
-    src/AssetHistory.cpp  # If the convergence also needs AssetHistory
+    src/AssetHistory.cpp 
 )
 target_include_directories(lookback_convergence
-    PUBLIC
-    ${CMAKE_SOURCE_DIR}/src
-    # If you need catch2 or other libraries:
-    # ${CMAKE_SOURCE_DIR}/extern/catch2
+    PUBLIC    ${CMAKE_SOURCE_DIR}/src
 )
+
+#//////////////////////////////////////////////////////////////////////////////
+#               generate_lookback_output 
+#/////////////////////////////////////////////////////////////////////////////
 
 add_executable(generate_lookback_output
     src/Option.cpp

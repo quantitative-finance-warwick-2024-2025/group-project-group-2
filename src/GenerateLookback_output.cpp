@@ -4,18 +4,15 @@
 
 int main()
 {
-    // Ensure PROJECT_ROOT_DIR is defined (usually via CMake)
     const std::filesystem::path root = PROJECT_ROOT_DIR;
     
-    // Path to the lookback_convergence executable (built inside the build folder)
+    // Path to the lookback_convergence executable
     const std::filesystem::path cmd = root / "build" / "lookback_convergence";
     
     // Output CSV file inside the src folder
     const std::filesystem::path output = root / "src" / "lookback_results.csv";
     
-    // Execute the command and capture its output
     capture_output(cmd.string(), output.string());
-    
     return 0;
 }
 
