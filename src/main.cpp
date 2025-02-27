@@ -32,7 +32,6 @@ int main()
 	std::cout << "Lookback Call Price (Antithetic): " << callP_Antithetic << std::endl;
 	std::cout << "Lookback Put Price (Antithetic): " << putP_Antithetic << std::endl;
 
-
 	return 0;
 }
 
