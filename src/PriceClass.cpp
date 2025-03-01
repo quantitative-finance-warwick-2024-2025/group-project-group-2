@@ -1,6 +1,8 @@
 #include <cmath>
 #include <iostream>
 #include <random>
+#include <numeric>
+
 #include "PriceClass.h"
 #include "LookbackOption.h"
 #include "AssetHistory.h"
@@ -114,7 +116,7 @@ double PriceClass::calculateP_Antithetic(const Option &option, double S, double 
 
 double normal_cdf(double x) {
     return 0.5 * (1 + std::erf(x / std::sqrt(2.0)));
-  }
+}
 double normal_ppf(double p, double tol = 1e-6) {
     // Calculate the quantile of standard normal distribution
     if (p <= 0 || p >= 1) {
@@ -169,7 +171,6 @@ double get_extreme(double S, double r, double sigma, double ST, double T, int pe
 
   return extreme;
 }
-
 double PriceClass::calculateP_StratifiedSampling(const Option& option, double S, double r, double sigma, double T, unsigned int nSimulations, unsigned int mStrata){
     // Convert pointer to base option class to LookbackOption
     const LookbackOption *lookbackOption = dynamic_cast<const LookbackOption *>(&option);
@@ -182,7 +183,7 @@ double PriceClass::calculateP_StratifiedSampling(const Option& option, double S,
     static std::random_device rd; 
     static std::mt19937 gen(rd());
     for (unsigned int i = 0; i < mStrata; ++i){
-        double iPayoff = 0.0; //
+        double iPayoff = 0.0; 
         
         // Generate a uniform random variable within the i-th stratum range [start, end)
         double start = static_cast<double> (i) / mStrata;
@@ -204,7 +205,69 @@ double PriceClass::calculateP_StratifiedSampling(const Option& option, double S,
         }
         // Compute the equally weighted layer-payoff 
         price += iPayoff/mStrata;
-    }      
+    } 
+    price *= std::exp(-r * lookbackOption->getExpiry());     
     return price;
 }
 
+double covariance(const std::vector<double>& X, const std::vector<double>& Y) {
+    if (X.size() != Y.size() || X.empty()) {
+        throw std::invalid_argument("Vectors must have the same non-zero length.");
+    }
+  
+    double meanX = std::accumulate(X.begin(), X.end(), 0.0) / X.size();
+    double meanY = std::accumulate(Y.begin(), Y.end(), 0.0) / Y.size();
+    double cov = 0.0;
+    int n = X.size();
+  
+    for (int i = 0; i < n; ++i) {
+        cov += (X[i] - meanX) * (Y[i] - meanY);
+    }
+  
+    return cov / n;
+}
+double PriceClass::calculateP_ControlVariates(const Option& option, double S, double r, double sigma, double T, unsigned int nSimulations){
+    // Convert pointer to base option class to LookbackOption
+    const LookbackOption *lookbackOption = dynamic_cast<const LookbackOption *>(&option);
+    if (!lookbackOption) {
+        // If option is not a LookbackOption, return 0.0
+        return 0.0;
+    }
+
+    double price =0.0;
+    double dt = lookbackOption->getExpiry() / lookbackOption->getPeriods();
+    std::vector<double> payoffs(nSimulations);
+    std::vector<double> ST(nSimulations);
+    std::vector<double> adjustedpayoffs(nSimulations);
+    std::normal_distribution<double> dist(0.0, 1.0);
+
+    for (unsigned int i = 0; i < nSimulations; ++i){
+        double spotPath = S;
+        double extreme = S; 
+        for (unsigned int j = 0; j < lookbackOption->getPeriods(); ++j) {
+            if (j > 0) {
+                double randNormal = dist(AssetHistory::get_random_generator());
+                spotPath *= std::exp((r - 0.5 * sigma * sigma) * dt +
+                                     sigma * std::sqrt(dt) * randNormal);
+            }
+            
+            if (lookbackOption->getType() == Option::Call) {
+                extreme = std::max(extreme, spotPath);
+            } else { // put
+                extreme = std::min(extreme, spotPath);
+            }
+        }
+        ST[i] = spotPath;
+        payoffs[i]= option.payoff(extreme);
+    }   
+    double cov=covariance(payoffs,ST);
+    double var=covariance(ST,ST);
+    double c=cov/var;
+    double ST_bar=std::accumulate(ST.begin(), ST.end(), 0.0) / ST.size();
+    for (unsigned int i = 0; i < nSimulations; ++i){
+        adjustedpayoffs[i]=payoffs[i]-c*(ST[i]-ST_bar);         
+    } 
+
+    price = std::accumulate(adjustedpayoffs.begin(), adjustedpayoffs.end(), 0.0) * std::exp(-r * lookbackOption->getExpiry()) / adjustedpayoffs.size();
+    return price;
+}

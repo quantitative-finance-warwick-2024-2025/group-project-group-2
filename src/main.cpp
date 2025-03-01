@@ -37,6 +37,12 @@ int main()
 	std::cout << "Lookback Call Price (Stratified Sampling): " << callP_StratifiedSampling << std::endl;
 	std::cout << "Lookback Put Price (Stratified Sampling): " << putP_StratifiedSampling << std::endl;
 	
+	double callP_ControlVariates = PriceClass::calculateP_ControlVariates(lookbackCall, S, r, sigma, T, nSimulations);
+	double putP_ControlVariates = PriceClass::calculateP_ControlVariates(lookbackPut, S, r, sigma, T, nSimulations);
+
+	std::cout << "Lookback Call Price (Control Variates): " << callP_ControlVariates << std::endl;
+	std::cout << "Lookback Put Price (Control Variates): " << putP_ControlVariates << std::endl;
+	
 	return 0;
 }
 
