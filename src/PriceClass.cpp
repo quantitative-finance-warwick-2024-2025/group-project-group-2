@@ -111,13 +111,6 @@ double PriceClass::calculateP_Antithetic(const Option &option, double S, double 
     return price;
 }
 
-void PriceClass::test(double a, double b){  
-    static std::random_device rd; 
-    static std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> dist(a, b);
-    double randUniform = dist(gen);
-    std::cout<< randUniform <<std::endl;
-}
 
 double normal_cdf(double x) {
     return 0.5 * (1 + std::erf(x / std::sqrt(2.0)));
