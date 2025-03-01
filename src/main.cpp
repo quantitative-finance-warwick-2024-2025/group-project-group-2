@@ -26,12 +26,17 @@ int main()
 	double callP_Antithetic = PriceClass::calculateP_Antithetic(lookbackCall, S, r, sigma, T, nSimulations);
 	double putP_Antithetic = PriceClass::calculateP_Antithetic(lookbackPut, S, r, sigma, T, nSimulations);
 	
-
 	std::cout << "Lookback Call Price (Naive): " << callP_Naive << std::endl;
 	std::cout << "Lookback Put Price (Naive): " << putP_Naive << std::endl;
 	std::cout << "Lookback Call Price (Antithetic): " << callP_Antithetic << std::endl;
 	std::cout << "Lookback Put Price (Antithetic): " << putP_Antithetic << std::endl;
 
+	double callP_StratifiedSampling = PriceClass::calculateP_StratifiedSampling(lookbackCall, S, r, sigma, T, 100, 10);
+	double putP_StratifiedSampling = PriceClass::calculateP_StratifiedSampling(lookbackPut, S, r, sigma, T, 100, 10);
+
+	std::cout << "Lookback Call Price (Stratified Sampling): " << callP_StratifiedSampling << std::endl;
+	std::cout << "Lookback Put Price (Stratified Sampling): " << putP_StratifiedSampling << std::endl;
+	
 	return 0;
 }
 
