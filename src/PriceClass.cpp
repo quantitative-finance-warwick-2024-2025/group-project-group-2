@@ -140,16 +140,16 @@ void brownian_bridge(std::vector<double>&W, std::vector<double>& times, int left
     int mid = (left + right) / 2;
     double t_mid = (t0 + t1) / 2;
 
-    double variance = (t1 - t0) / 4.0;
-    std::normal_distribution<double> dist(0.0, std::sqrt(variance));
+    double std_variance = std::sqrt((t1 - t0) / 4.0);
+    std::normal_distribution<double> dist(0.0, 1.0);
 
-    W[mid] = (W[left] + W[right]) / 2.0 + dist(gen);
+    W[mid] = (W[left] + W[right]) / 2.0 + std_variance * dist(gen);
     times[mid] = t_mid;
     brownian_bridge(W, times, left, mid, t0, t_mid);
     brownian_bridge(W, times, mid, right, t_mid, t1);
 }
-double get_extreme(double S, double r, double sigma, double ST, double T, int periods,Option::Type optionType){
-  int N = T * (1 << periods);
+double get_extreme(double S, double r, double sigma, double ST, double T, int log_periods,Option::Type optionType){
+  int N = 1 << log_periods;
   std::vector<double> W(N + 1);
   std::vector<double> times(N + 1);
   std::vector<double> St(N + 1);
@@ -159,7 +159,7 @@ double get_extreme(double S, double r, double sigma, double ST, double T, int pe
   times[N] = T;
   brownian_bridge(W, times, 0, N, 0.0, T);
   for (int i = 0; i <= N; ++i) {
-    St[i] = S * std::exp((r - 0.5 * sigma * sigma) * times[i] + sigma * std::sqrt(times[i]) * W[i]);
+    St[i] = S * std::exp((r - 0.5 * sigma * sigma) * times[i] + sigma * W[i]);
   }
 
   double extreme;
@@ -197,7 +197,7 @@ double PriceClass::calculateP_StratifiedSampling(const Option& option, double S,
             double randomterm = sigma*std::sqrt(lookbackOption->getExpiry())*normal_ppf(randUniform);
             // Simulate S_T from each W_N
             double ST = S*std::exp((r - 0.5 * sigma * sigma) * lookbackOption->getExpiry() + randomterm);
-            double extreme = get_extreme(S, r, sigma, ST, T, 15, lookbackOption->getType());
+            double extreme = get_extreme(S, r, sigma, ST, T, 13, lookbackOption->getType());
             double jPayoff = option.payoff(extreme);
 
             // Compute the payoff in layer i
@@ -268,6 +268,6 @@ double PriceClass::calculateP_ControlVariates(const Option& option, double S, do
         adjustedpayoffs[i]=payoffs[i]-c*(ST[i]-ST_bar);         
     } 
 
-    price = std::accumulate(adjustedpayoffs.begin(), adjustedpayoffs.end(), 0.0) * std::exp(-r * lookbackOption->getExpiry()) / adjustedpayoffs.size();
+    price = std::exp(-r * lookbackOption->getExpiry()) * std::accumulate(adjustedpayoffs.begin(), adjustedpayoffs.end(), 0.0) / adjustedpayoffs.size();
     return price;
 }

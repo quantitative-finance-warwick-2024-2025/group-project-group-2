@@ -10,11 +10,11 @@ int main()
 	double r = 0.02; // risk-free rate
 	double sigma = 0.1; // volatility
 	double T = 1.0; // expiry
-	unsigned int nSimulations = 250000; // number of simulations
+	unsigned int nSimulations = 10000; // number of simulations
 
 	
 	LookbackOption::StrikeType strikeType = LookbackOption::Fixed;
-	unsigned int periods = 10;
+	unsigned int periods = 10000;
 
 
 	// Create a lookback call option
@@ -31,8 +31,8 @@ int main()
 	std::cout << "Lookback Call Price (Antithetic): " << callP_Antithetic << std::endl;
 	std::cout << "Lookback Put Price (Antithetic): " << putP_Antithetic << std::endl;
 
-	double callP_StratifiedSampling = PriceClass::calculateP_StratifiedSampling(lookbackCall, S, r, sigma, T, 100, 10);
-	double putP_StratifiedSampling = PriceClass::calculateP_StratifiedSampling(lookbackPut, S, r, sigma, T, 100, 10);
+	double callP_StratifiedSampling = PriceClass::calculateP_StratifiedSampling(lookbackCall, S, r, sigma, T, 10000, 10);
+	double putP_StratifiedSampling = PriceClass::calculateP_StratifiedSampling(lookbackPut, S, r, sigma, T, 10000, 10);
 
 	std::cout << "Lookback Call Price (Stratified Sampling): " << callP_StratifiedSampling << std::endl;
 	std::cout << "Lookback Put Price (Stratified Sampling): " << putP_StratifiedSampling << std::endl;
