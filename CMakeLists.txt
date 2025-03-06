@@ -15,6 +15,7 @@ set(SRC_FILES ${CMAKE_SOURCE_DIR}/src/main.cpp
               ${CMAKE_SOURCE_DIR}/src/LookbackOption.cpp 
               ${CMAKE_SOURCE_DIR}/src/Option.cpp 
               ${CMAKE_SOURCE_DIR}/src/PriceClass.cpp
+              ${CMAKE_SOURCE_DIR}/src/AssetHistory.cpp
               ${CMAKE_SOURCE_DIR}/src/Util.cpp)
 
 
