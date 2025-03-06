@@ -37,12 +37,18 @@ double PriceClass::calculateP_Naive(const Option& option, double S, double r, do
             }
             
             // Update the extreme value:
-            // For a call, we track the maximum price.
-            // For a put, we track the minimum price.
-            if (lookbackOption->getType() == Option::Call) {
+            // For a Fixed strike call, we track the maximum price.
+            // For a Fixed strike put, we track the minimum price.
+            // For a Floating Strike call, we track the minimum price
+            // For a Floating Strike Put, we track the maximum price
+            if ((lookbackOption->getType() == Option::Call) & (lookbackOption->getStrikeType() == LookbackOption::Fixed)) {
                 extreme = std::max(extreme, spotPath);
-            } else { // put
+            } else if ((lookbackOption->getType() == Option::Put) & (lookbackOption->getStrikeType() == LookbackOption::Fixed)) { // put
                 extreme = std::min(extreme, spotPath);
+            } else if ((lookbackOption->getType() == Option::Call) & (lookbackOption->getStrikeType() == LookbackOption::Floating)){
+                extreme = std::min(extreme, spotPath);
+            } else if ((lookbackOption->getType() == Option::Put) & (lookbackOption->getStrikeType() == LookbackOption::Floating)){
+                extreme = std::max(extreme, spotPath);
             }
         }
         
