@@ -13,13 +13,12 @@ int main()
 	unsigned int nSimulations = 250000; // number of simulations
 
 	
-	LookbackOption::StrikeType strikeType = LookbackOption::Fixed;
+	LookbackOption::StrikeType strikeType = LookbackOption::Floating;
 	unsigned int periods = 10;
 
-
 	// Create a lookback call option
-	LookbackOption lookbackCall(K, T, Option::Call, periods, LookbackOption::Fixed);
-	LookbackOption lookbackPut(K, T, Option::Put, periods, LookbackOption::Fixed);
+	LookbackOption lookbackCall(K, T, Option::Call, periods, LookbackOption::Floating);
+	LookbackOption lookbackPut(K, T, Option::Put, periods, LookbackOption::Floating);
 
 	double callP_Naive = PriceClass::calculateP_Naive(lookbackCall, S, r, sigma, T, nSimulations);
 	double putP_Naive = PriceClass::calculateP_Naive(lookbackPut, S, r, sigma, T, nSimulations);

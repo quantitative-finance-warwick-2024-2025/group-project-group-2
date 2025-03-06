@@ -5,6 +5,7 @@
 //Initialises the LookbackOption with the given parameters
 // Also stores the number of periods that are monitored
 
+
 LookbackOption::LookbackOption(double K, double T, Option::Type optionType, unsigned int periods, StrikeType strikeType) 
     : Option(K,T, optionType), periods(periods), strikeType(strikeType) {}
 
