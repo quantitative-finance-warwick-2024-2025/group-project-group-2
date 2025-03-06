@@ -30,13 +30,15 @@ double LookbackOption::payoff(double S_T, double extreme) const {
         } else { // Put
             return std::max(K - extreme, 0.0);
         }
-    } else { // StrikeType::Floating
+    } else if (getStrikeType() == StrikeType::Floating) { // StrikeType::Floating
         if (getType() == Option::Call) {
             return std::max(S_T - extreme, 0.0);
         } else { // Put 
             return std::max(extreme - S_T, 0.0);
         }
     }
+    // Default return if none of the conditions match.
+    return 0.0;
 }
 
 unsigned int LookbackOption::getPeriods() const {

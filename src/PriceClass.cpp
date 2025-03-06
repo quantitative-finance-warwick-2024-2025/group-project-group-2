@@ -8,116 +8,102 @@
 #include "AssetHistory.h"
 #include "Util.h"
 
+// Helper function to update the extreme value based on option type and strike type.
+static double updateExtreme(double currentExtreme, double spotPath, const LookbackOption* lookbackOption) {
+    if ((lookbackOption->getType() == Option::Call) && (lookbackOption->getStrikeType() == LookbackOption::Fixed)) {
+        // For a fixed-strike call, track the maximum price.
+        return std::max(currentExtreme, spotPath);
+    } else if ((lookbackOption->getType() == Option::Put) && (lookbackOption->getStrikeType() == LookbackOption::Fixed)) {
+        // For a fixed-strike put, track the minimum price.
+        return std::min(currentExtreme, spotPath);
+    } else if ((lookbackOption->getType() == Option::Call) && (lookbackOption->getStrikeType() == LookbackOption::Floating)) {
+        // For a floating-strike call, track the minimum price.
+        return std::min(currentExtreme, spotPath);
+    } else if ((lookbackOption->getType() == Option::Put) && (lookbackOption->getStrikeType() == LookbackOption::Floating)) {
+        // For a floating-strike put, track the maximum price.
+        return std::max(currentExtreme, spotPath);
+    }
+    return currentExtreme; // Default fallback (should never be reached if types are set correctly).
+}
+
 double PriceClass::calculateP_Naive(const Option& option, double S, double r, double sigma, double T, unsigned int nSimulations) {
-    
-    // Convert pointer to base option class to LookbackOption
-    // Want to check that the given option object is a LookbackOption object
     const LookbackOption *lookbackOption = dynamic_cast<const LookbackOption *>(&option);
+    if (!lookbackOption) {
+        return 0.0;
+    }
     
-    
-    // Using normal distribution from AssetHistory to generate random numbers
     std::normal_distribution<double> dist(0.0, 1.0);
-    
-    // Divide the option expiry into discrete time periods
     double dt = lookbackOption->getExpiry() / lookbackOption->getPeriods();
     double sumPayoffs = 0.0;
     
-    // Loop over simulation paths.
     for (unsigned int i = 0; i < nSimulations; ++i) {
         double spotPath = S;
-        double extreme = S; // Initialise extreme value with the starting spot.
+        double extreme = S; // Initialize extreme with the starting price.
         
-        // For each monitoring period, simulate the asset price evolution.
-        // (For j==0 we already have the initial price.)
         for (unsigned int j = 0; j < lookbackOption->getPeriods(); ++j) {
             if (j > 0) {
                 double randNormal = dist(AssetHistory::get_random_generator());
-                spotPath *= std::exp((r - 0.5 * sigma * sigma) * dt +
-                                     sigma * std::sqrt(dt) * randNormal);
+                spotPath *= std::exp((r - 0.5 * sigma * sigma) * dt + sigma * std::sqrt(dt) * randNormal);
             }
-            
-            // Update the extreme value:
-            // For a Fixed strike call, we track the maximum price.
-            // For a Fixed strike put, we track the minimum price.
-            // For a Floating Strike call, we track the minimum price
-            // For a Floating Strike Put, we track the maximum price
-            if ((lookbackOption->getType() == Option::Call) & (lookbackOption->getStrikeType() == LookbackOption::Fixed)) {
-                extreme = std::max(extreme, spotPath);
-            } else if ((lookbackOption->getType() == Option::Put) & (lookbackOption->getStrikeType() == LookbackOption::Fixed)) { // put
-                extreme = std::min(extreme, spotPath);
-            } else if ((lookbackOption->getType() == Option::Call) & (lookbackOption->getStrikeType() == LookbackOption::Floating)){
-                extreme = std::min(extreme, spotPath);
-            } else if ((lookbackOption->getType() == Option::Put) & (lookbackOption->getStrikeType() == LookbackOption::Floating)){
-                extreme = std::max(extreme, spotPath);
-            }
+            extreme = updateExtreme(extreme, spotPath, lookbackOption);
         }
         
-        // Evaluate the payoff based on the extreme value.
-        sumPayoffs += option.payoff(extreme);
+        // Use the appropriate payoff function based on strike type.
+        if (lookbackOption->getStrikeType() == LookbackOption::Floating) {
+            sumPayoffs += lookbackOption->payoff(spotPath, extreme);
+        } else {
+            sumPayoffs += option.payoff(extreme);
+        }
     }
     
-    // Discount the average payoff back to present value.
     double price = (sumPayoffs / nSimulations) * std::exp(-r * lookbackOption->getExpiry());
     return price;
 }
 
+
 double PriceClass::calculateP_Antithetic(const Option &option, double S, double r, double sigma, double T, unsigned int nSimulations) {
-    // Convert pointer to base option class to LookbackOption
     const LookbackOption *lookbackOption = dynamic_cast<const LookbackOption *>(&option);
     if (!lookbackOption) {
-        // If option is not a LookbackOption, return 0.0
         return 0.0;
     }
 
-    // Using normal distribution from AssetHistory to generate random numbers
     std::normal_distribution<double> dist(0.0, 1.0);
-
-    // Time increment based on number of periods
     double dt = lookbackOption->getExpiry() / lookbackOption->getPeriods();
     double sumPayoffs = 0.0;
 
-    // Simulate nSimulations paths with antithetic variates
-    for (unsigned int i = 0; i < nSimulations; ++i){
-        // Initialise normal and antithetic random variables
+    for (unsigned int i = 0; i < nSimulations; ++i) {
         double spotPath = S;
-        double extreme = S;
         double antitheticSpotPath = S;
+        double extreme = S;
         double antitheticExtreme = S;
 
-        // Loop over periods
         for (unsigned int j = 0; j < lookbackOption->getPeriods(); ++j) {
             if (j > 0) {
-                // Generate random numbers
                 double randNormal = dist(AssetHistory::get_random_generator());
                 double randAntithetic = -randNormal;
-
-                // Simulate spot price evolution
                 spotPath *= std::exp((r - 0.5 * sigma * sigma) * dt + sigma * std::sqrt(dt) * randNormal);
                 antitheticSpotPath *= std::exp((r - 0.5 * sigma * sigma) * dt + sigma * std::sqrt(dt) * randAntithetic);
             }
-
-            // Update extreme values
-            if (lookbackOption->getType() == Option::Call) {
-                extreme = std::max(extreme, spotPath);
-                antitheticExtreme = std::max(antitheticExtreme, antitheticSpotPath);
-            } else {
-                extreme = std::min(extreme, spotPath);
-                antitheticExtreme = std::min(antitheticExtreme, antitheticSpotPath);
-            }
+            extreme = updateExtreme(extreme, spotPath, lookbackOption);
+            antitheticExtreme = updateExtreme(antitheticExtreme, antitheticSpotPath, lookbackOption);
         }
-
-        // Evaluate the payoff for both paths.
-        double payoff1 = lookbackOption->payoff(spotPath, extreme);
-        double payoff2 = lookbackOption->payoff(antitheticSpotPath, antitheticExtreme);
+        
+        double payoff1, payoff2;
+        if (lookbackOption->getStrikeType() == LookbackOption::Floating) {
+            payoff1 = lookbackOption->payoff(spotPath, extreme);
+            payoff2 = lookbackOption->payoff(antitheticSpotPath, antitheticExtreme);
+        } else {
+            payoff1 = option.payoff(extreme);
+            payoff2 = option.payoff(antitheticExtreme);
+        }
         double avgPayoff = (payoff1 + payoff2) / 2.0;
         sumPayoffs += avgPayoff;
-
     }
 
-    // Discount the average payoff back to present value.
     double price = (sumPayoffs / nSimulations) * std::exp(-r * lookbackOption->getExpiry());
     return price;
 }
+
 
 
 double normal_cdf(double x) {
@@ -178,10 +164,8 @@ double get_extreme(double S, double r, double sigma, double ST, double T, int lo
   return extreme;
 }
 double PriceClass::calculateP_StratifiedSampling(const Option& option, double S, double r, double sigma, double T, unsigned int nSimulations, unsigned int mStrata){
-    // Convert pointer to base option class to LookbackOption
     const LookbackOption *lookbackOption = dynamic_cast<const LookbackOption *>(&option);
     if (!lookbackOption) {
-        // If option is not a LookbackOption, return 0.0
         return 0.0;
     }
 
@@ -190,29 +174,27 @@ double PriceClass::calculateP_StratifiedSampling(const Option& option, double S,
     static std::mt19937 gen(rd());
     for (unsigned int i = 0; i < mStrata; ++i){
         double iPayoff = 0.0; 
-        
-        // Generate a uniform random variable within the i-th stratum range [start, end)
-        double start = static_cast<double> (i) / mStrata;
-        double end = static_cast<double>(i+1)/ mStrata;
+        double start = static_cast<double>(i) / mStrata;
+        double end = static_cast<double>(i + 1) / mStrata;
         std::uniform_real_distribution<double> dist(start, end);
+        unsigned int simsPerStratum = nSimulations / mStrata;
         
-        // nSimulations/mStrata:the number of simulations in each layer
-        for (unsigned int j = 0; j < nSimulations/mStrata; ++j){             
+        for (unsigned int j = 0; j < simsPerStratum; ++j){             
             double randUniform = dist(gen);
-            // Simulate j different values of W_N in the layer i
-            double randomterm = sigma*std::sqrt(lookbackOption->getExpiry())*normal_ppf(randUniform);
-            // Simulate S_T from each W_N
-            double ST = S*std::exp((r - 0.5 * sigma * sigma) * lookbackOption->getExpiry() + randomterm);
+            double randomterm = sigma * std::sqrt(lookbackOption->getExpiry()) * normal_ppf(randUniform);
+            double ST = S * std::exp((r - 0.5 * sigma * sigma) * lookbackOption->getExpiry() + randomterm);
             double extreme = get_extreme(S, r, sigma, ST, T, 13, lookbackOption->getType());
-            double jPayoff = option.payoff(extreme);
-
-            // Compute the payoff in layer i
-            iPayoff += jPayoff / (static_cast<double>(nSimulations)/mStrata);
+            double jPayoff;
+            if (lookbackOption->getStrikeType() == LookbackOption::Floating) {
+                jPayoff = lookbackOption->payoff(ST, extreme);
+            } else {
+                jPayoff = option.payoff(extreme);
+            }
+            iPayoff += jPayoff / static_cast<double>(simsPerStratum);
         }
-        // Compute the equally weighted layer-payoff 
-        price += iPayoff/mStrata;
+        price += iPayoff / mStrata;
     } 
-    price *= std::exp(-r * lookbackOption->getExpiry());     
+    price *= std::exp(-r * lookbackOption->getExpiry());
     return price;
 }
 
@@ -233,18 +215,15 @@ double covariance(const std::vector<double>& X, const std::vector<double>& Y) {
     return cov / n;
 }
 double PriceClass::calculateP_ControlVariates(const Option& option, double S, double r, double sigma, double T, unsigned int nSimulations){
-    // Convert pointer to base option class to LookbackOption
     const LookbackOption *lookbackOption = dynamic_cast<const LookbackOption *>(&option);
     if (!lookbackOption) {
-        // If option is not a LookbackOption, return 0.0
         return 0.0;
     }
 
-    double price =0.0;
     double dt = lookbackOption->getExpiry() / lookbackOption->getPeriods();
     std::vector<double> payoffs(nSimulations);
     std::vector<double> ST(nSimulations);
-    std::vector<double> adjustedpayoffs(nSimulations);
+    std::vector<double> adjustedPayoffs(nSimulations);
     std::normal_distribution<double> dist(0.0, 1.0);
 
     for (unsigned int i = 0; i < nSimulations; ++i){
@@ -253,27 +232,27 @@ double PriceClass::calculateP_ControlVariates(const Option& option, double S, do
         for (unsigned int j = 0; j < lookbackOption->getPeriods(); ++j) {
             if (j > 0) {
                 double randNormal = dist(AssetHistory::get_random_generator());
-                spotPath *= std::exp((r - 0.5 * sigma * sigma) * dt +
-                                     sigma * std::sqrt(dt) * randNormal);
+                spotPath *= std::exp((r - 0.5 * sigma * sigma) * dt + sigma * std::sqrt(dt) * randNormal);
             }
-            
-            if (lookbackOption->getType() == Option::Call) {
-                extreme = std::max(extreme, spotPath);
-            } else { // put
-                extreme = std::min(extreme, spotPath);
-            }
+            extreme = updateExtreme(extreme, spotPath, lookbackOption);
         }
         ST[i] = spotPath;
-        payoffs[i]= option.payoff(extreme);
+        if (lookbackOption->getStrikeType() == LookbackOption::Floating) {
+            payoffs[i] = lookbackOption->payoff(spotPath, extreme);
+        } else {
+            payoffs[i] = option.payoff(extreme);
+        }
     }   
-    double cov=covariance(payoffs,ST);
-    double var=covariance(ST,ST);
-    double c=cov/var;
-    double ST_bar=std::accumulate(ST.begin(), ST.end(), 0.0) / ST.size();
+    double cov = covariance(payoffs, ST);
+    double var = covariance(ST, ST);
+    double c = cov / var;
+    double ST_bar = std::accumulate(ST.begin(), ST.end(), 0.0) / ST.size();
+    std::vector<double> adjusted(nSimulations);
     for (unsigned int i = 0; i < nSimulations; ++i){
-        adjustedpayoffs[i]=payoffs[i]-c*(ST[i]-ST_bar);         
+        adjusted[i] = payoffs[i] - c * (ST[i] - ST_bar);         
     } 
 
-    price = std::exp(-r * lookbackOption->getExpiry()) * std::accumulate(adjustedpayoffs.begin(), adjustedpayoffs.end(), 0.0) / adjustedpayoffs.size();
+    double price = std::exp(-r * lookbackOption->getExpiry()) *
+                   std::accumulate(adjusted.begin(), adjusted.end(), 0.0) / adjusted.size();
     return price;
 }
