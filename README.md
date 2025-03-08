@@ -49,3 +49,52 @@ Below is a step-by-step guide for building the project via the command line. If 
    ```bash
    mkdir build
    cd build
+
+4. **Generater Build Files with CMake** 
+    ```bash
+    cmake ..
+
+5. **Compile the Project**
+    ```bash
+    cmake --build
+
+### Running the Main Application
+
+1. **Navigate to the Main Application's Build Folder**
+    ```bash
+    cd build
+
+2. **Run the Executable**
+    On Mac:
+    ``bash
+    ./generate_lookback_output
+
+    On Windows:
+    ``bash
+    generate_lookback_output.exe
+
+
+### Running the Tests
+
+1. **Navigate to the Tests Build Folder**
+    ```bash
+    cd build/tests
+
+2. **Run the Executable**
+    On Mac:
+    ``bash
+    ./TestOption
+    ./TestLookbackOption
+    ./TestPriceClass
+
+    On Windows:
+    ``bash
+    TestOption.exe
+    TestLookbackOption.exe
+    TestPriceClass.exe
+
+
+
+
+
+

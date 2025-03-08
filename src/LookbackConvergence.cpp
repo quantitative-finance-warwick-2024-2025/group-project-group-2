@@ -9,7 +9,7 @@ int main() {
     double K      = 80.0;
     double r      = 0.02;
     double sigma  = 0.1;
-    double T      = 1.0;
+    double T      = 3.0;
 
     // Test a lookback call, fixed strike
     unsigned int periods = 10;
