@@ -65,11 +65,11 @@ Below is a step-by-step guide for building the project via the command line. If 
     cd build
 
 2. **Run the Executable**
-    On Mac:
+On Mac:
     ``bash
     ./generate_lookback_output
 
-    On Windows:
+On Windows:
     ``bash
     generate_lookback_output.exe
 
@@ -81,13 +81,13 @@ Below is a step-by-step guide for building the project via the command line. If 
     cd build/tests
 
 2. **Run the Executable**
-    On Mac:
+On Mac:
     ``bash
     ./TestOption
     ./TestLookbackOption
     ./TestPriceClass
 
-    On Windows:
+On Windows:
     ``bash
     TestOption.exe
     TestLookbackOption.exe
