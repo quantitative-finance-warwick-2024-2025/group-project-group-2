@@ -103,8 +103,23 @@ TestLookbackOption.exe
 TestPriceClass.exe
 \`\`\`
 
+***
 
+## Implementation
 
+The UML below briefly outlines the design of our codebase.
+
+![](./assets/UML.png)
+
+`Option.hpp` and `Option.cpp` define a base class called `Option`, representing a generic financial option. This class includes a constructor for initialising key parameters such as the strike price, expiry, and option type (call or put). It also declares a pure virtual function, `payoff()`, which computes the option's payoff at maturity. Additionally, the class provides accessor methods to retrieve the strike, expiry, and option type.
+
+`LookbackOption.hpp` and `LookbackOption.cpp` define a derived class called `LookbackOption`, which inherits from the `Option` base class. A lookback option’s payoff depends on the extreme (maximum or minimum) asset prices observed during its lifetime. The constructor sets specific parameters such as the number of monitoring periods and whether the option has a fixed or floating strike. The `payoff()` function is overridden to account for these path-dependent features, and the class includes accessors to retrieve the strike type and the number of monitoring periods.
+
+`PriceClass.hpp` and `PriceClass.cpp` define a `PriceClass` that employs numerical methods—specifically, Monte Carlo simulation—to price options. Its constructor initializes parameters such as the number of simulations, the spot price, the risk-free rate, volatility, and time to maturity. The core methods within this class (e.g., `calculateP_Naive`, `calculateP_Antithetic`, `calculateP_ControlVariates`, and `calculateP_StratifiedSampling`) rely on the option’s `payoff()` function to compute the payoff for each simulated path.
+
+`main.cpp` serves as the driver program. It instantiates a `LookbackOption` with the desired parameters, passes it to the `PriceClass` instance to calculate the option price, and outputs the resulting prices to the console.
+
+The entire codebase adheres to object-oriented programming best practices—encapsulation, inheritance, and polymorphism. It is well-documented and follows clear coding standards, ensuring the project is both maintainable and extensible.
 
 
 
