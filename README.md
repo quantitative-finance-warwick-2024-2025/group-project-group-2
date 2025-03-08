@@ -46,40 +46,46 @@ Below is a step-by-step guide for building the project via the command line. If 
 2. **Open a Terminal** in the project’s root directory (where the main `CMakeLists.txt` file is located).
 
 3. **Create a Build Directory** and navigate into it:
-   ```bash
+   ```
    mkdir build
    cd build
+   ```
 
 4. **Generater Build Files with CMake** 
-    ```bash
+    ```
     cmake ..
+    ```
 
 5. **Compile the Project**
-    ```bash
+    ```
     cmake --build
+    ```
 
 ### Running the Main Application
 
 1. **Navigate to the Main Application's Build Folder**
-    ```bash
+    ```
     cd build
+    ```
 
 2. **Run the Executable**
 On Mac:
-    ``bash
+    ```
     ./generate_lookback_output
+    ```
 
 On Windows:
-    ``bash
+    ```
     generate_lookback_output.exe
+    ```
 
 
 ### Running the Tests
 
 1. **Navigate to the Tests Build Folder**
-    ```bash
+    ```
     cd build/tests
-
+    ```
 2. **Run the Executable**
 On Mac:
     ```
