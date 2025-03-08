@@ -82,16 +82,18 @@ On Windows:
 
 2. **Run the Executable**
 On Mac:
-    ``bash
+    ```
     ./TestOption
     ./TestLookbackOption
     ./TestPriceClass
+    ```
 
 On Windows:
-    ``bash
+    ```
     TestOption.exe
     TestLookbackOption.exe
     TestPriceClass.exe
+    ```
 
 
 
