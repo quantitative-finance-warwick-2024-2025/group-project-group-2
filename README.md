@@ -75,9 +75,10 @@ On Mac:
     ```
 
 On Windows:
-    ```
+    \`\`\`bash
     generate_lookback_output.exe
-    ```
+    \`\`\`
+
 
 
 ### Running the Tests
@@ -95,11 +96,12 @@ On Mac:
     ```
 
 On Windows:
-    ```
-    TestOption.exe
-    TestLookbackOption.exe
-    TestPriceClass.exe
-    ```
+
+\`\`\`bash
+TestOption.exe
+TestLookbackOption.exe
+TestPriceClass.exe
+\`\`\`
 
 
 
