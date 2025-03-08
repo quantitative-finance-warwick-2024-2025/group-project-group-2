@@ -75,9 +75,9 @@ On Mac:
     ```
 
 On Windows:
-    \`\`\`bash
+    ```
     generate_lookback_output.exe
-    \`\`\`
+    ```
 
 
 
@@ -97,11 +97,12 @@ On Mac:
 
 On Windows:
 
-\`\`\`bash
-TestOption.exe
-TestLookbackOption.exe
-TestPriceClass.exe
-\`\`\`
+    ```
+    TestOption.exe, 
+    TestLookbackOption.exe, 
+    TestPriceClass.exe
+    ```
+    
 
 ***
 
@@ -111,15 +112,25 @@ The UML below briefly outlines the design of our codebase.
 
 ![](./assets/UML.png)
 
-`Option.hpp` and `Option.cpp` define a base class called `Option`, representing a generic financial option. This class includes a constructor for initialising key parameters such as the strike price, expiry, and option type (call or put). It also declares a pure virtual function, `payoff()`, which computes the option's payoff at maturity. Additionally, the class provides accessor methods to retrieve the strike, expiry, and option type.
+Below is a concise overview of the project’s class structure and supporting modules, as depicted in the UML diagram:
 
-`LookbackOption.hpp` and `LookbackOption.cpp` define a derived class called `LookbackOption`, which inherits from the `Option` base class. A lookback option’s payoff depends on the extreme (maximum or minimum) asset prices observed during its lifetime. The constructor sets specific parameters such as the number of monitoring periods and whether the option has a fixed or floating strike. The `payoff()` function is overridden to account for these path-dependent features, and the class includes accessors to retrieve the strike type and the number of monitoring periods.
+- **Option**  
+  Serves as an abstract base class for financial derivatives. It declares core attributes such as the strike price, expiry, and option type, and provides a pure virtual function, `payoff()`, to be implemented by derived classes.
 
-`PriceClass.hpp` and `PriceClass.cpp` define a `PriceClass` that employs numerical methods—specifically, Monte Carlo simulation—to price options. Its constructor initializes parameters such as the number of simulations, the spot price, the risk-free rate, volatility, and time to maturity. The core methods within this class (e.g., `calculateP_Naive`, `calculateP_Antithetic`, `calculateP_ControlVariates`, and `calculateP_StratifiedSampling`) rely on the option’s `payoff()` function to compute the payoff for each simulated path.
+- **LookbackOption**  
+  Inherits from `Option` and specialises the payoff logic to account for the extreme (maximum or minimum) asset price observed over the option’s lifetime. It introduces additional parameters, including the number of monitoring periods and whether the strike is fixed or floating.
 
-`main.cpp` serves as the driver program. It instantiates a `LookbackOption` with the desired parameters, passes it to the `PriceClass` instance to calculate the option price, and outputs the resulting prices to the console.
+- **PriceClass**  
+  Implements various Monte Carlo simulation methods (e.g., naive, antithetic, control variates, and stratified sampling) for pricing options. It calls the option’s `payoff()` function to compute path-dependent payoffs and ultimately determine the option price.
 
-The entire codebase adheres to object-oriented programming best practices—encapsulation, inheritance, and polymorphism. It is well-documented and follows clear coding standards, ensuring the project is both maintainable and extensible.
+- **AssetHistory and Util**  
+  Provide utility functions and classes for reading, generating, and manipulating asset price data. These modules operate independently from the option-pricing classes but support the simulation process.
+
+- **Test Suite**  
+  Includes test files such as `TestPriceClass`, `TestOption`, and `TestLookbackOption` that verify the correctness of each component, ensuring robust functionality across the entire codebase.
+
+
+Overall, this design fosters modularity and extensibility: each class or module focuses on a specific task — whether it is payoff calculation, simulation, or data handling — while the test suite and analysis scripts ensure correctness and facilitate deeper investigation of pricing behaviour.
 
 
 
