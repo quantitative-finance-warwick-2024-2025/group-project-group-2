@@ -14,7 +14,7 @@ int main()
 
 	
 	LookbackOption::StrikeType strikeType = LookbackOption::Fixed;
-	unsigned int periods = 10000;
+	unsigned int periods = 1<<13;
 
 
 	// Create a lookback call option

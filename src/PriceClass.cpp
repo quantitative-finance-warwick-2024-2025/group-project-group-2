@@ -148,8 +148,8 @@ void brownian_bridge(std::vector<double>&W, std::vector<double>& times, int left
     brownian_bridge(W, times, left, mid, t0, t_mid);
     brownian_bridge(W, times, mid, right, t_mid, t1);
 }
-double get_extreme(double S, double r, double sigma, double ST, double T, int log_periods,Option::Type optionType){
-  int N = 1 << log_periods;
+double get_extreme(double S, double r, double sigma, double ST, double T, int periods,Option::Type optionType){
+  int N = periods;
   std::vector<double> W(N + 1);
   std::vector<double> times(N + 1);
   std::vector<double> St(N + 1);
@@ -197,7 +197,7 @@ double PriceClass::calculateP_StratifiedSampling(const Option& option, double S,
             double randomterm = sigma*std::sqrt(lookbackOption->getExpiry())*normal_ppf(randUniform);
             // Simulate S_T from each W_N
             double ST = S*std::exp((r - 0.5 * sigma * sigma) * lookbackOption->getExpiry() + randomterm);
-            double extreme = get_extreme(S, r, sigma, ST, T, 13, lookbackOption->getType());
+            double extreme = get_extreme(S, r, sigma, ST, T, lookbackOption->getPeriods(), lookbackOption->getType());
             double jPayoff = option.payoff(extreme);
 
             // Compute the payoff in layer i
