@@ -10,7 +10,7 @@ int main()
 	double r = 0.02; // risk-free rate
 	double sigma = 0.1; // volatility
 	double T = 1.0; // expiry
-	unsigned int nSimulations = 10000; // number of simulations
+	unsigned int nSimulations = 1000; // number of simulations
 
 	
 	LookbackOption::StrikeType strikeType = LookbackOption::Fixed;
