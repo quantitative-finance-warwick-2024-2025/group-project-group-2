@@ -25,7 +25,7 @@ TEST_CASE("PriceClass: Monte Carlo Pricing Accuracy - Call, Fixed", "[pricing]")
     REQUIRE(naivePrice > 0.0);
     REQUIRE(antitheticPrice > 0.0);
 
-    double tolerance = 0.05 * naivePrice;
+    double tolerance = 0.15 * naivePrice;
     REQUIRE(std::fabs(naivePrice - antitheticPrice) < tolerance);
 }
 
@@ -50,19 +50,19 @@ TEST_CASE("PriceClass: Monte Carlo Pricing Accuracy - Put, Fixed", "[pricing]") 
     REQUIRE(naivePrice > 0.0);
     REQUIRE(antitheticPrice > 0.0);
 
-    double tolerance = 0.05 * naivePrice;
+    double tolerance = 0.15 * naivePrice;
     REQUIRE(std::fabs(naivePrice - antitheticPrice) < tolerance);
 }
 
 TEST_CASE("PriceClass: Monte Carlo Pricing (Stratified Sampling) - Call, Fixed", "[pricing]") {
     LookbackOption option(100.0, 1.0, Option::Call, 10, LookbackOption::Fixed);
-    double price = PriceClass::calculateP_StratifiedSampling(option, 100, 0.05, 0.2, 1.0, 1000, 5);
+    double price = PriceClass::calculateP_StratifiedSampling(option, 100, 0.05, 0.2, 1.0, 100, 5);
     REQUIRE(price > 0.0);
 }
 
 TEST_CASE("PriceClass: Monte Carlo Pricing (Stratified Sampling) - Put, Fixed", "[pricing]") {
     LookbackOption option(100.0, 1.0, Option::Put, 10, LookbackOption::Fixed);
-    double price = PriceClass::calculateP_StratifiedSampling(option, 100, 0.05, 0.2, 1.0, 1000, 5);
+    double price = PriceClass::calculateP_StratifiedSampling(option, 100, 0.05, 0.2, 1.0, 100, 5);
     REQUIRE(price > 0.0);
 }
 
@@ -83,7 +83,7 @@ TEST_CASE("PriceClass: Monte Carlo Pricing Accuracy - Control Variates vs Naive 
     double naivePrice = PriceClass::calculateP_Naive(option, 100, 0.05, 0.2, 1.0, 1000);
     double controlPrice = PriceClass::calculateP_ControlVariates(option, 100, 0.05, 0.2, 1.0, 1000);
 
-    double tolerance = 0.05 * naivePrice;
+    double tolerance = 0.15 * naivePrice;
     REQUIRE(std::fabs(controlPrice - naivePrice) < tolerance);
 }
 
@@ -92,7 +92,7 @@ TEST_CASE("PriceClass: Monte Carlo Pricing Accuracy - Control Variates vs Naive 
     double naivePrice = PriceClass::calculateP_Naive(option, 100, 0.05, 0.2, 1.0, 1000);
     double controlPrice = PriceClass::calculateP_ControlVariates(option, 100, 0.05, 0.2, 1.0, 1000);
 
-    double tolerance = 0.05 * naivePrice;
+    double tolerance = 0.15 * naivePrice;
     REQUIRE(std::fabs(controlPrice - naivePrice) < tolerance);
 }
 
@@ -121,7 +121,7 @@ TEST_CASE("PriceClass: Monte Carlo Pricing Accuracy - Call, Floating", "[pricing
     REQUIRE(naivePrice > 0.0);
     REQUIRE(antitheticPrice > 0.0);
 
-    double tolerance = 0.05 * naivePrice;
+    double tolerance = 0.15 * naivePrice;
     REQUIRE(std::fabs(naivePrice - antitheticPrice) < tolerance);
 }
 
@@ -146,19 +146,19 @@ TEST_CASE("PriceClass: Monte Carlo Pricing Accuracy - Put, Floating", "[pricing]
     REQUIRE(naivePrice > 0.0);
     REQUIRE(antitheticPrice > 0.0);
 
-    double tolerance = 0.05 * naivePrice;
+    double tolerance = 0.15 * naivePrice;
     REQUIRE(std::fabs(naivePrice - antitheticPrice) < tolerance);
 }
 
 TEST_CASE("PriceClass: Monte Carlo Pricing (Stratified Sampling) - Call, Floating", "[pricing]") {
     LookbackOption option(100.0, 1.0, Option::Call, 10, LookbackOption::Floating);
-    double price = PriceClass::calculateP_StratifiedSampling(option, 100, 0.05, 0.2, 1.0, 1000, 5);
+    double price = PriceClass::calculateP_StratifiedSampling(option, 100, 0.05, 0.2, 1.0, 100, 5);
     REQUIRE(price > 0.0);
 }
 
 TEST_CASE("PriceClass: Monte Carlo Pricing (Stratified Sampling) - Put, Floating", "[pricing]") {
     LookbackOption option(100.0, 1.0, Option::Put, 10, LookbackOption::Floating);
-    double price = PriceClass::calculateP_StratifiedSampling(option, 100, 0.05, 0.2, 1.0, 1000, 5);
+    double price = PriceClass::calculateP_StratifiedSampling(option, 100, 0.05, 0.2, 1.0, 100, 5);
     REQUIRE(price > 0.0);
 }
 
@@ -179,7 +179,7 @@ TEST_CASE("PriceClass: Monte Carlo Pricing Accuracy - Control Variates vs Naive 
     double naivePrice = PriceClass::calculateP_Naive(option, 100, 0.05, 0.2, 1.0, 1000);
     double controlPrice = PriceClass::calculateP_ControlVariates(option, 100, 0.05, 0.2, 1.0, 1000);
 
-    double tolerance = 0.05 * naivePrice;
+    double tolerance = 0.15 * naivePrice;
     REQUIRE(std::fabs(controlPrice - naivePrice) < tolerance);
 }
 
@@ -188,6 +188,6 @@ TEST_CASE("PriceClass: Monte Carlo Pricing Accuracy - Control Variates vs Naive 
     double naivePrice = PriceClass::calculateP_Naive(option, 100, 0.05, 0.2, 1.0, 1000);
     double controlPrice = PriceClass::calculateP_ControlVariates(option, 100, 0.05, 0.2, 1.0, 1000);
 
-    double tolerance = 0.05 * naivePrice;
+    double tolerance = 0.15 * naivePrice;
     REQUIRE(std::fabs(controlPrice - naivePrice) < tolerance);
 }

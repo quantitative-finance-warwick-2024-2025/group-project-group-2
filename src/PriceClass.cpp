@@ -140,7 +140,7 @@ void brownian_bridge(std::vector<double>&W, std::vector<double>& times, int left
     brownian_bridge(W, times, left, mid, t0, t_mid);
     brownian_bridge(W, times, mid, right, t_mid, t1);
 }
-double get_extreme(double S, double r, double sigma, double ST, double T, int log_periods,Option::Type optionType){
+double get_extreme(double S, double r, double sigma, double ST, double T, int log_periods,Option::Type optionType, LookbackOption::StrikeType strikeType){
   int N = 1 << log_periods;
   std::vector<double> W(N + 1);
   std::vector<double> times(N + 1);
@@ -155,11 +155,20 @@ double get_extreme(double S, double r, double sigma, double ST, double T, int lo
   }
 
   double extreme;
-  if (optionType == Option::Call) {
-    extreme = *std::max_element(St.begin(), St.end());
-  } else { // put
-    extreme = *std::min_element(St.begin(), St.end());
-  }
+  if (strikeType == LookbackOption::Floating) {
+        if (optionType == Option::Call) {
+            extreme = *std::min_element(St.begin(), St.end());
+        } else { // Put
+            extreme = *std::max_element(St.begin(), St.end());
+        }
+    } else {
+        // For fixed strike, follow the standard: max for call, min for put.
+        if (optionType == Option::Call) {
+            extreme = *std::max_element(St.begin(), St.end());
+        } else { // Put
+            extreme = *std::min_element(St.begin(), St.end());
+        }
+    }
 
   return extreme;
 }
@@ -183,7 +192,7 @@ double PriceClass::calculateP_StratifiedSampling(const Option& option, double S,
             double randUniform = dist(gen);
             double randomterm = sigma * std::sqrt(lookbackOption->getExpiry()) * normal_ppf(randUniform);
             double ST = S * std::exp((r - 0.5 * sigma * sigma) * lookbackOption->getExpiry() + randomterm);
-            double extreme = get_extreme(S, r, sigma, ST, T, 13, lookbackOption->getType());
+            double extreme = get_extreme(S, r, sigma, ST, T, 13, lookbackOption->getType(), lookbackOption->getStrikeType());
             double jPayoff;
             if (lookbackOption->getStrikeType() == LookbackOption::Floating) {
                 jPayoff = lookbackOption->payoff(ST, extreme);

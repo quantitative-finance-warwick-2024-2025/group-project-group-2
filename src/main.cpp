@@ -10,8 +10,8 @@ int main()
 	double r = 0.02; // risk-free rate
 	double sigma = 0.1; // volatility
 	double T = 3.0; // expiry
-	unsigned int nSimulations = 50; // number of simulations
-	unsigned int periods = 4;
+	unsigned int nSimulations = 1000; // number of simulations
+	unsigned int periods = 1024;
 
 
 	// Create a lookback call option
