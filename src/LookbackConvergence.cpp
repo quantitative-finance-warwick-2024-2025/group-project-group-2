@@ -38,7 +38,7 @@ int main() {
     std::cout << "\nConvergence over periods\n";
     std::cout << "periods, Call Naive, Call Antithetic, Call Strat_Sampling, Call Control Variates, Put Naive, Put Antithetic, Put Strat_Sampling, Put Control Variates\n";
     unsigned int nSimConvergence = 1000;
-    for (unsigned int p : {5, 10, 20, 50, 100, 200, 500, 1000}) {
+    for (unsigned int p : {1<<2, 1<<3, 1<<4, 1<<5, 1<<6, 1<<7, 1<<8, 1<<9, 1<<10, 1<<11}) {
         LookbackOption lbCall(K, T, Option::Call, p, LookbackOption::Fixed);
         LookbackOption lbPut(K, T, Option::Put, p, LookbackOption::Fixed);
     
