@@ -71,12 +71,12 @@ Below is a step-by-step guide for building the project via the command line. If 
 2. **Run the Executable**
 On Mac:
     ```
-    ./generate_lookback_output
+    ./lookback_convergence
     ```
 
 On Windows:
     ```
-    generate_lookback_output.exe
+    lookback_convergence.exe
     ```
 
 
