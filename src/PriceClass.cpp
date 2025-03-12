@@ -140,8 +140,8 @@ void brownian_bridge(std::vector<double>&W, std::vector<double>& times, int left
     brownian_bridge(W, times, left, mid, t0, t_mid);
     brownian_bridge(W, times, mid, right, t_mid, t1);
 }
-double get_extreme(double S, double r, double sigma, double ST, double T, int log_periods,Option::Type optionType, LookbackOption::StrikeType strikeType){
-  int N = 1 << log_periods;
+double get_extreme(double S, double r, double sigma, double ST, double T, int periods,Option::Type optionType, LookbackOption::StrikeType strikeType){
+  int N = periods;
   std::vector<double> W(N + 1);
   std::vector<double> times(N + 1);
   std::vector<double> St(N + 1);
@@ -192,7 +192,7 @@ double PriceClass::calculateP_StratifiedSampling(const Option& option, double S,
             double randUniform = dist(gen);
             double randomterm = sigma * std::sqrt(lookbackOption->getExpiry()) * normal_ppf(randUniform);
             double ST = S * std::exp((r - 0.5 * sigma * sigma) * lookbackOption->getExpiry() + randomterm);
-            double extreme = get_extreme(S, r, sigma, ST, T, 13, lookbackOption->getType(), lookbackOption->getStrikeType());
+            double extreme = get_extreme(S, r, sigma, ST, T, lookbackOption->getPeriods(), lookbackOption->getType(), lookbackOption->getStrikeType());
             double jPayoff;
             if (lookbackOption->getStrikeType() == LookbackOption::Floating) {
                 jPayoff = lookbackOption->payoff(ST, extreme);
