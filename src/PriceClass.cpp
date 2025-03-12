@@ -192,7 +192,7 @@ double PriceClass::calculateP_StratifiedSampling(const Option& option, double S,
             double randUniform = dist(gen);
             double randomterm = sigma * std::sqrt(lookbackOption->getExpiry()) * normal_ppf(randUniform);
             double ST = S * std::exp((r - 0.5 * sigma * sigma) * lookbackOption->getExpiry() + randomterm);
-            double extreme = get_extreme(S, r, sigma, ST, T, lookbackOption->getPeriods(), lookbackOption->getType(), lookbackOption->getStrikeType());
+            double extreme = get_extreme(S, r, sigma, ST, T, 13, lookbackOption->getType(), lookbackOption->getStrikeType());
             double jPayoff;
             if (lookbackOption->getStrikeType() == LookbackOption::Floating) {
                 jPayoff = lookbackOption->payoff(ST, extreme);
