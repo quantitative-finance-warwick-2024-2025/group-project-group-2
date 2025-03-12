@@ -12,9 +12,9 @@ int main() {
     double T      = 3.0;
 
     // Test a lookback call, fixed strike
-    unsigned int periods = 10;
-    LookbackOption lookbackCall(K, T, Option::Call, periods, LookbackOption::Fixed);
-    LookbackOption lookbackPut(K, T, Option::Put, periods, LookbackOption::Fixed);
+    unsigned int periods = 1024;
+    LookbackOption lookbackCall(K, T, Option::Call, periods, LookbackOption::Floating);
+    LookbackOption lookbackPut(K, T, Option::Put, periods, LookbackOption::Floating);
 
 
     // 1) Convergence over number of simulations:
